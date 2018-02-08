@@ -1,0 +1,38 @@
+{
+  "name": "geek-meet",
+  "version": "0.0.1",
+  "description": "Conference room tv software",
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 8.9.0"
+  },
+  "devDependencies": {
+    "@types/express": "4.11.1",
+    "@types/socket.io": "1.4.31",
+    "@types/jest": "22.0.1",
+    "@types/node": "8.5.8",
+    "jest": "22.1.1",
+    "rimraf": "2.6.2",
+    "tslint": "5.9.1",
+    "tslint-microsoft-contrib": "5.0.2",
+    "tsutils": "2.18.0",
+    "typescript": "2.6.2"
+  },
+  "scripts": {
+    "clean": "rimraf coverage build tmp",
+    "build": "tsc -p tsconfig.release.json",
+    "watch": "tsc -w -p tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "pretest": "npm run lint",
+    "test": "npm run test-only",
+    "test-only": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "author": "smithgeek",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.16.2",
+    "socket.io": "2.0.4",
+    "tslib": "1.8.1"
+  }
+}

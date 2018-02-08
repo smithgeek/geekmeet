@@ -1,0 +1,72 @@
+<!doctype html>
+<html style="height: 100%;">
+    <head>
+        <title>GeekMeet</title>
+        <script type="text/javascript">
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+        </script>
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    </head>
+    <body>
+        <div id="Tvs">
+            <input id="m" autocomplete="off" value="https://metrics.showings.com" /><button onclick="setUrl()">Send</button><button onclick="refreshUrl()">Refresh</button>
+            <a href="/meeting.html?room=war&tv=topleft">Join Meeting</a>
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/babel">
+
+            class Tv extends React.Component{
+                constructor(props){
+                    super(props);
+                    this.state = {
+                        url: this.props.tv.url
+                    }
+                    this.handleChange = this.handleChange.bind(this);
+                }
+
+                componentWillReceiveProps(nextProps){
+                    this.setState({url: nextProps.tv.url});
+                }
+
+                handleChange = (event) => {
+                    this.setState({url: event.target.value});
+                }
+
+                render(){
+                    const {tv, room} = this.props;
+                    return <li>{tv.name !== "Default" && <h3>{tv.name}</h3>}
+                        URL: <input autoComplete="off" value={this.state.url} id={`${room.name}_${tv.name}_val`} onChange={this.handleChange} />
+                        <button onClick={() => socket.emit('action', {action: "URL", target: `${room.name}_${tv.name}`, url: document.querySelector(`#${room.name}_${tv.name}_val`).value})}>Send</button>
+                        <button onClick={() => socket.emit('action', {action: "RELOAD", target: `${room.name}_${tv.name}`})}>Refresh</button>
+                        <div>{tv.participants} Active Participants</div>
+                        <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`}>Join Meeting</a>
+                    </li>;
+                }
+            }
+
+            function render(rooms){
+                if(rooms){
+                    ReactDOM.render(rooms.map(room => <div key={room.name}>
+                        <h2>{room.name}</h2>
+                        <ul>
+                            {room.tvs.map(tv => <Tv tv={tv} room={room} key={tv.name} />)}
+                        </ul>
+                    </div>), document.getElementById("Tvs"));
+                }
+            }
+            var socket = io();
+            socket.on("query", render);
+            socket.on("status_change", render);
+        </script>
+    </body>
+</html>

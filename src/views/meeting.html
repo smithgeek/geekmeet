@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <script src="https://meet.jit.si/external_api.js"></script>
+    </head>
+    <body style="margin: 0; padding: 0">
+        <div id="meet" style="width: 100%; height: 100%; background-color: black;">
+
+        </div>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+
+            const isTv = getParameterByName('isTv');
+            const tv = getParameterByName('tv');
+            const room = getParameterByName("room");
+
+            let api = new JitsiMeetExternalAPI("meet.jit.si", {
+                roomName: `css_corp_${room}_${tv}-F0BLgf6Dhwuf2oxyxNZk`,
+                parentNode: document.querySelector("#meet"),
+                configOverwrite: {
+                    requireDisplayName: false,
+                },
+                interfaceConfigOverwrite: {
+                    filmStripOnly: false,
+                    SHOW_JITSI_WATERMARK: false,
+                    SHOW_WATERMARK_FOR_GUESTS: false,
+                }
+            });
+            if(isTv){
+                api.executeCommand('displayName', 'tv');
+                api.executeCommand('avatarUrl', 'https://pbs.twimg.com/profile_images/742375648019107842/J5QjK8uT.jpg');
+            }
+            var socket = io();
+            socket.on("query", () => {
+                socket.emit("join", {room, tv, isTv})
+            });
+        </script>
+    </body>
+</html>
