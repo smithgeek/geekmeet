@@ -21,12 +21,15 @@
             const isTv = getParameterByName('isTv');
             const tv = getParameterByName('tv');
             const room = getParameterByName("room");
+            let meId = 0;
+
+            const displayName = isTv ? "tv" : localStorage.getItem("jitsi_displayname");
 
             let api = new JitsiMeetExternalAPI("meet.jit.si", {
                 roomName: `css_corp_${room}_${tv}-F0BLgf6Dhwuf2oxyxNZk`,
                 parentNode: document.querySelector("#meet"),
                 configOverwrite: {
-                    requireDisplayName: false,
+                    requireDisplayName: displayName === null,
                 },
                 interfaceConfigOverwrite: {
                     filmStripOnly: false,
@@ -34,9 +37,22 @@
                     SHOW_WATERMARK_FOR_GUESTS: false,
                 }
             });
+            api.on("videoConferenceJoined", args => {
+                meId = args.id;
+            });
             if(isTv){
                 api.executeCommand('displayName', 'tv');
                 api.executeCommand('avatarUrl', 'https://pbs.twimg.com/profile_images/742375648019107842/J5QjK8uT.jpg');
+            }
+            else{
+                api.on("displayNameChange", args => {
+                    if(args.id === meId){
+                        localStorage.setItem("jitsi_displayname", args.displayname)
+                    }
+                });
+                if(displayName !== null){
+                    api.executeCommand('displayName', displayName);
+                }
             }
             var socket = io();
             socket.on("query", () => {

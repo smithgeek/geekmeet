@@ -22,13 +22,32 @@
         <script src="/socket.io/socket.io.js"></script>
         <script>
             var socket = io();
-            const tv = getParameterByName('tv');
-            const room = getParameterByName("room");
+            const tv = getParameterByName('tv').replace(/ /g, "_");
+            const room = getParameterByName("room").replace(/ /g, "_");
             const tvId = `${room}_${tv}`;
             let currentCount = 0;
+
+            function handleParticipantCount(count){
+                if(count > 0 && currentCount < 1){
+                    document.querySelector('#contentIframe').src = `/meeting.html?room=${room}&tv=${tv}&isTv=true`;
+                }
+                if(count < 1 && currentCount > 0){
+                    document.querySelector('#contentIframe').src = localStorage.getItem(tvId) || "";
+                }
+                currentCount = count;
+            }
             document.querySelector('#contentIframe').src = localStorage.getItem(tvId) || "";
-            socket.on("query", () => {
+            socket.on("query", rooms => {
                 socket.emit("join", {room, tv, isTv: true, url: localStorage.getItem(tvId)});
+                rooms.forEach(r => {
+                    if(r.name === room){
+                        for(let i = 0; i < r.tvs.length; ++i){
+                            if(r.tvs[i].name === tv){
+                                handleParticipantCount(r.tvs[i].participants);
+                            }
+                        }
+                    }
+                });
             });
             socket.on("action", args => {
                 console.log(args);
@@ -38,18 +57,10 @@
                     socket.emit("url_change", args.url);
                 }
                 else if(args.action === "RELOAD"){
-                    document.querySelector('#contentIframe').src = document.querySelector('#contentIframe').src
+                    window.location.reload();
                 }
             });
-            socket.on("participants_change", count => {
-                if(count > 0 && currentCount < 1){
-                    document.querySelector('#contentIframe').src = `/meeting.html?room=${room}&tv=${tv}&isTv=true`;
-                }
-                if(count < 1 && currentCount > 0){
-                    document.querySelector('#contentIframe').src = localStorage.getItem(tvId) || "";
-                }
-                currentCount = count;
-            });
+            socket.on("participants_change", handleParticipantCount);
         </script>
     </body>
 </html>

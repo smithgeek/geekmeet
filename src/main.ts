@@ -7,17 +7,7 @@ const app = express();
 const http = new Server(app);
 const io = socketIo(http);
 
-app.get('/display.html', function(req, res){
-	res.sendFile(__dirname + '/views/display.html');
-});
-
-app.get('/meeting.html', function(req, res){
-	res.sendFile(__dirname + '/views/meeting.html');
-});
-
-app.get('/', function(req, res){
-	res.sendFile(__dirname + '/views/index.html');
-});
+app.use(express.static('views'));
 
 interface Tv{
 	name: string;

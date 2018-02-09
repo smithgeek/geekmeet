@@ -1,6 +1,9 @@
 <!doctype html>
-<html style="height: 100%;">
+<html lang="en" style="height: 100%;">
     <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <title>GeekMeet</title>
         <script type="text/javascript">
             function getParameterByName(name, url) {
@@ -16,11 +19,14 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <link rel="stylesheet" href="/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="/js/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="/js/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
     </head>
     <body>
-        <div id="Tvs">
-            <input id="m" autocomplete="off" value="https://metrics.showings.com" /><button onclick="setUrl()">Send</button><button onclick="refreshUrl()">Refresh</button>
-            <a href="/meeting.html?room=war&tv=topleft">Join Meeting</a>
+        <div id="Tvs" style="margin: 3rem">
         </div>
         <script src="/socket.io/socket.io.js"></script>
         <script type="text/babel">
@@ -29,38 +35,64 @@
                 constructor(props){
                     super(props);
                     this.state = {
-                        url: this.props.tv.url
+                        url: this.props.tv.url || ""
                     }
                     this.handleChange = this.handleChange.bind(this);
+                    this.handleKeyPress = this.handleKeyPress.bind(this);
+                    this.sendUrl = this.sendUrl.bind(this);
                 }
 
                 componentWillReceiveProps(nextProps){
                     this.setState({url: nextProps.tv.url});
                 }
 
-                handleChange = (event) => {
-                    this.setState({url: event.target.value});
+                handleChange(event){
+                    this.setState({url: event.target.value || ""});
+                }
+
+                handleKeyPress(event){
+                    if(event.key === "Enter"){
+                        this.sendUrl();
+                    }
+                }
+
+                sendUrl(){
+                    const {tv, room} = this.props;
+                    socket.emit('action', {action: "URL", target: `${room.name}_${tv.name}`, url: document.querySelector(`#${room.name}_${tv.name}_val`).value});
                 }
 
                 render(){
                     const {tv, room} = this.props;
-                    return <li>{tv.name !== "Default" && <h3>{tv.name}</h3>}
-                        URL: <input autoComplete="off" value={this.state.url} id={`${room.name}_${tv.name}_val`} onChange={this.handleChange} />
-                        <button onClick={() => socket.emit('action', {action: "URL", target: `${room.name}_${tv.name}`, url: document.querySelector(`#${room.name}_${tv.name}_val`).value})}>Send</button>
-                        <button onClick={() => socket.emit('action', {action: "RELOAD", target: `${room.name}_${tv.name}`})}>Refresh</button>
-                        <div>{tv.participants} Active Participants</div>
-                        <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`}>Join Meeting</a>
-                    </li>;
+                    return <div className="card" style={{maxWidth: 400}}>
+                        <div className="card-body">
+                            <h5 className="card-title">{tv.name.replace(/_/g, " ")}</h5>
+                            <div className="card-text">
+                                <div className="input-group mb-3">
+                                    <div className="input-group-prepend">
+                                        <button className="btn btn-outline-primary" type="button" onClick={() => socket.emit('action', {action: "RELOAD", target: `${room.name}_${tv.name}`})}> <span className="oi oi-reload"></span></button>
+                                    </div>
+                                    <input type="text" className="form-control" placeholder="Display Url" value={this.state.url} id={`${room.name}_${tv.name}_val`} onChange={this.handleChange} onKeyPress={this.handleKeyPress} />
+                                    <div className="input-group-append">
+                                        <button className="btn btn-success" type="button" onClick={this.sendUrl}>Go</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`} className="card-link">Join</a>
+                        </div>
+                        <div className="card-footer">
+                            <small className="text-muted">{tv.participants} Users Joined</small>
+                        </div>
+                    </div>;
                 }
             }
 
             function render(rooms){
                 if(rooms){
                     ReactDOM.render(rooms.map(room => <div key={room.name}>
-                        <h2>{room.name}</h2>
-                        <ul>
+                        <h2>{room.name.replace(/_/g, " ")}</h2>
+                        <div className="card-deck" style={{marginBottom: 20}}>
                             {room.tvs.map(tv => <Tv tv={tv} room={room} key={tv.name} />)}
-                        </ul>
+                        </div>
                     </div>), document.getElementById("Tvs"));
                 }
             }
