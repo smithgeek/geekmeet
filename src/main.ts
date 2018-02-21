@@ -1,11 +1,29 @@
 import * as express from 'express';
 import {Server} from 'http';
 import * as socketIo from 'socket.io';
+import * as cookieParser from 'cookie-parser';
 import * as fs from 'fs';
 
 const app = express();
 const http = new Server(app);
 const io = socketIo(http);
+
+let config: {epoch?: string, salt?: string};
+try{
+	config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
+}
+catch{
+	console.warn("could not read config file");
+	config = {};
+}
+
+app.use(cookieParser());
+
+app.use((req, res, next) => {
+	res.cookie('epoch', config.epoch || 'January 1, 2000');
+	res.cookie("salt", config.salt || "8Glo7I5BxYCLEDqqdcrP");
+	next();
+})
 
 app.use(express.static('views'));
 
@@ -88,7 +106,7 @@ io.on('connection', function(socket){
   	});
   	socket.on('action', args => {
 		io.to(args.target).emit('action', args);
-  	})
+	});
 });
 
 app.get('/rooms', (req, res) => {

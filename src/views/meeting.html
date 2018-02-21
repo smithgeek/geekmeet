@@ -7,29 +7,47 @@
 
         </div>
         <script src="/socket.io/socket.io.js"></script>
+        <script src="/js/common.js"></script>
         <script type="text/javascript">
-            function getParameterByName(name, url) {
-                if (!url) url = window.location.href;
-                name = name.replace(/[\[\]]/g, "\\$&");
-                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                    results = regex.exec(url);
-                if (!results) return null;
-                if (!results[2]) return '';
-                return decodeURIComponent(results[2].replace(/\+/g, " "));
-            }
-
             const isTv = getParameterByName('isTv');
             const tv = getParameterByName('tv');
             const room = getParameterByName("room");
             let meId = 0;
 
+            const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+            const epoch = new Date(decodeURIComponent(readCookie("epoch")) || "January 1 2000");
+            const today = new Date();
+            const diffDays = Math.round(Math.abs((epoch.getTime() - today.getTime())/(oneDay)));
+            let seed = diffDays;
+
+            function hashCode(str) {
+                return Math.abs(str.split('').reduce((prevHash, currVal) =>
+                    ((prevHash << 5) - prevHash) + currVal.charCodeAt(0), 0));
+            }
+
+            function makeid() {
+                function random() {
+                    const x = Math.sin(++seed) * 10000;
+                    return x - Math.floor(x);
+                }
+
+                let text = "";
+                const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+                for (let i = 0; i < 20; i++)
+                    text += possible.charAt(Math.floor(random() * possible.length));
+
+                return hashCode((readCookie("salt") || "") + text);
+            }
             const displayName = isTv ? "tv" : localStorage.getItem("jitsi_displayname");
 
             let api = new JitsiMeetExternalAPI("meet.jit.si", {
-                roomName: `css_corp_${room}_${tv}-F0BLgf6Dhwuf2oxyxNZk`,
+                roomName: `gm_${window.location.hostname}_${hashCode(room + makeid())}${hashCode(tv + makeid())}${makeid()}${makeid()}`,
                 parentNode: document.querySelector("#meet"),
                 configOverwrite: {
                     requireDisplayName: displayName === null,
+                    startWithAudioMuted: isTv,
+                    startWithVideoMuted: isTv,
                 },
                 interfaceConfigOverwrite: {
                     filmStripOnly: false,

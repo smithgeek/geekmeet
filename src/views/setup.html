@@ -1,0 +1,18 @@
+<!doctype html>
+<html style="height: 100%;">
+    <head>
+        <title>GeekMeet Setup</title>
+        <script type="text/javascript" src="js/common.js"></script>
+    </head>
+    <body style="margin: 0; padding: 0; height: 100%; overflow: hidden; display: flex; flex-direction: column;">
+
+        <div id="content1" style="flex: 1; color: black; font-size: 100px; display: flex; justify-content: center; align-items: flex-end"></div>
+        <div id="content2" style="flex: 1; color: white; font-size: 100px; display: flex; justify-content: center; align-items: flex-start"></div>
+        <script>
+            const color = getParameterByName('color');
+            document.getElementById("content1").innerText = color;
+            document.getElementById("content2").innerText = color;
+            document.getElementsByTagName("body")[0].style.backgroundColor = color;
+        </script>
+    </body>
+</html>
