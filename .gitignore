@@ -29,3 +29,5 @@ build/
 .DS_Store
 
 /src/config.json
+/src/main.js*
+/src/main.d.ts

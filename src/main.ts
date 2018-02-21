@@ -50,6 +50,9 @@ function joinTv(args: {room: string, tv: string, isTv?: boolean, url?: string}, 
 	if(!tv){
 		tv = {name: args.tv, participants: 0, url : args.url};
 		room.tvs.push(tv);
+		const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+		// tslint:disable-next-line:no-console
+		console.log("new tv joined", { room: room.name, tv: tv.name, ip });
 		io.emit("status_change", rooms);
 		io.to(getTvId(args)).emit("query");
 		socket.on("disconnect", () => {
