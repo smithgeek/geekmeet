@@ -1,0 +1,31 @@
+<html>
+    <body>
+        <ol>
+            <li><a href="https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/HelpDesk_Download/">Download</a> the Tinker OS image. You should use the TinkerOS_Debian system.</li>
+            <li>Download <a href="https://etcher.io/">Etcher</a></li>
+            <li>Use etcher to flash the OS image to an sd card.</li>
+            <li>Power on the device. Note: You should have a display connected the first time you boot or you may an error that requires reflashing the sd card.</li>
+            <li>Download and run the install script.</li>
+            <h2>Option 1: Connect mouse and keyboard</h2>
+            <ol>
+                <li>Right click and save <a href="/start.sh">start.sh</a> to the desktop.</li>
+                <li>Right click the file and select properties<br /><img src="/img/1.png" /></li>
+                <li>Switch to the Permissions tab and change Execute to Anyone<br /><img src="/img/2.png" /></li>
+                <li>Double click the file and select Execute in Terminal<br /><img src="/img/3.png" /></li>
+            </ol>
+            <h2>Option 2: Using ssh</h2>
+            <ol>
+                <li>Connect to the device using <code>ssh linaro@{ip_address}</code> password <code>linaro</code></li>
+                <li>Download and run the install script.</li>
+                <div>
+                    <code id="curlDownload">curl start.sh</code><br />
+                    <code>chmod +x ./start.sh</code><br />
+                    <code>./start.sh</code><br />
+                </div>
+            </ol>
+        </ol>
+        <script type="text/javascript">
+            document.getElementById("curlDownload").innerHTML = `curl ${window.location.href.replace("install.html", "start.sh")}`;
+        </script>
+    </body>
+</html>
