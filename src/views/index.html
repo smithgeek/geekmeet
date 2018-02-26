@@ -9,10 +9,10 @@
         <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
         <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-        <link rel="stylesheet" href="/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <script src="/js/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-        <script src="/js/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="/css/bootstrap.min.css" crossorigin="anonymous">
+        <script src="/js/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+        <script src="/js/popper.min.js" crossorigin="anonymous"></script>
+        <script src="/js/bootstrap.min.js" crossorigin="anonymous"></script>
         <link href="/open-iconic/font/css/open-iconic-bootstrap.css" rel="stylesheet">
     </head>
     <body>
@@ -89,7 +89,7 @@
                         </div>}
 
                         <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`} className="card-link">Join</a>
-                        {isAdmin && <a href={`http://${tv.ip}:3000/`} className="card-link">Manage</a>}
+                        {isAdmin && <a href={`http://${tv.ip.substring(0, tv.ip.indexOf(":"))}:3000/`} className="card-link">Manage</a>}
                     </div>;
 
                     const renameView = <div>
