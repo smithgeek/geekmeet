@@ -26,6 +26,16 @@ app.use((_req, res, next) => {
 	next();
 });
 
+app.get("/start.sh", (req, res) => {
+	const content = fs.readFileSync("./views/start.sh", "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`)
+	res.send(content);
+});
+
+app.get("/update.sh", (req, res) => {
+	const content = fs.readFileSync("./views/update.sh", "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`)
+	res.send(content);
+});
+
 app.use(express.static('views'));
 
 interface Tv{
