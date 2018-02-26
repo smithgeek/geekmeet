@@ -14,11 +14,7 @@
             const room = getParameterByName("room");
             let meId = 0;
 
-            const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-            const epoch = new Date(decodeURIComponent(readCookie("epoch")) || "January 1 2000");
-            const today = new Date();
-            const diffDays = Math.round(Math.abs((epoch.getTime() - today.getTime())/(oneDay)));
-            let seed = diffDays;
+            let seed = Number.parseInt(readCookie("seed") || "1");
 
             function hashCode(str) {
                 return Math.abs(str.split('').reduce((prevHash, currVal) =>

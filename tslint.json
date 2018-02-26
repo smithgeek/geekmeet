@@ -23,7 +23,8 @@
     "interface-name": false,
     "whitespace": false,
     "variable-name": false,
-    "align": false,
+	"align": false,
+	"no-backbone-get-set-outside-model": false,
     "trailing-comma": [ // https://palantir.github.io/tslint/rules/trailing-comma/
       true,
       {

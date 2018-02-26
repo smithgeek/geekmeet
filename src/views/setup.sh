@@ -16,7 +16,13 @@ then
     # Hide mouse when not moving
     sudo apt-get install -y unclutter
     sudo cp /etc/X11/xinit/xinitrc ~/.xinitrc
+	sudo chown linaro .xinitrc
     echo "unclutter -idle 2 &" >> ~/.xinitrc
+
+	#Start Chromium on boot
+	echo 'chromium --homepage "{url}/display.html" --start-fullscreen &' >> ~/.xsessionrc
+	#Allow third party cookies so the jitsi meeting stuff actually works
+	sed -i -e 's/"block_third_party_cookies":true,/"block_third_party_cookies":false,/g' ~/.config/chromium/Default/Preferences
 
     #Install nano
     sudo apt-get install -y nano

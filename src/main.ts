@@ -1,9 +1,9 @@
+import {exec} from 'child_process';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import * as fs from 'fs';
 import {Server} from 'http';
 import * as socketIo from 'socket.io';
-import {exec} from 'child_process';
 
 const app = express();
 const http = new Server(app);
@@ -18,22 +18,33 @@ catch {
 	config = {};
 }
 
+const oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+
 app.use(cookieParser());
 
 app.use((_req, res, next) => {
-	res.cookie('epoch', config.epoch || 'January 1, 2000');
+	const epoch = new Date(config.epoch || 'January 1, 2000');
+	const today = new Date();
+	const diffDays = Math.round(Math.abs((epoch.getTime() - today.getTime())/(oneDay)));
+	res.cookie('seed', diffDays);
 	res.cookie("salt", config.salt || "8Glo7I5BxYCLEDqqdcrP");
 	next();
 });
 
+function getScript(req: express.Request, file: string) {
+	return fs.readFileSync(`./views/${file}`, "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`);
+}
+
 app.get("/start.sh", (req, res) => {
-	const content = fs.readFileSync("./views/start.sh", "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`)
-	res.send(content);
+	res.send(getScript(req, "start.sh"));
 });
 
 app.get("/update.sh", (req, res) => {
-	const content = fs.readFileSync("./views/update.sh", "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`)
-	res.send(content);
+	res.send(getScript(req, "update.sh"));
+});
+
+app.get("/setup.sh", (req, res) => {
+	res.send(getScript(req, "setup.sh"));
 });
 
 app.use(express.static('./src/views'));
@@ -59,7 +70,7 @@ function joinTv(args: {room: string, tv: string, isTv?: boolean, url?: string}, 
 		rooms.push(room);
 	}
 	let tv = room.tvs.find(t => t.name === args.tv);
-	if(!tv){
+	if (!tv) {
 		const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
 		tv = {name: args.tv, participants: 0, url : args.url, ip};
 		room.tvs.push(tv);
