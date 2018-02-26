@@ -27,7 +27,8 @@
     "pretest": "npm run lint",
     "test": "npm run test-only",
     "test-only": "jest --coverage",
-    "test:watch": "jest --watch"
+		"test:watch": "jest --watch",
+		"update": "git pull & npm install & tsc"
   },
   "author": "smithgeek",
   "license": "MIT",

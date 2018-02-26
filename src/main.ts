@@ -3,6 +3,7 @@ import * as express from 'express';
 import * as fs from 'fs';
 import {Server} from 'http';
 import * as socketIo from 'socket.io';
+import {exec} from 'child_process';
 
 const app = express();
 const http = new Server(app);
@@ -31,6 +32,7 @@ interface Tv{
 	name: string;
 	participants: number;
 	url?: string;
+	ip: string;
 }
 
 interface Room{
@@ -48,9 +50,9 @@ function joinTv(args: {room: string, tv: string, isTv?: boolean, url?: string}, 
 	}
 	let tv = room.tvs.find(t => t.name === args.tv);
 	if(!tv){
-		tv = {name: args.tv, participants: 0, url : args.url};
-		room.tvs.push(tv);
 		const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+		tv = {name: args.tv, participants: 0, url : args.url, ip};
+		room.tvs.push(tv);
 		// tslint:disable-next-line:no-console
 		console.log("new tv joined", { room: room.name, tv: tv.name, ip });
 		io.emit("status_change", rooms);
@@ -113,8 +115,18 @@ io.on('connection', (socket) => {
 	});
 });
 
-app.get('/rooms', (_req, res) => {
+app.get('/api/rooms', (_req, res) => {
 	res.json(rooms);
+});
+
+app.get("/api/Update", (_req, res) => {
+	exec("npm run update", (error, stdout, stderr) => {
+		res.status(200).json({error, stdout, stderr}).send();
+	});
+});
+
+app.get("/api/Restart", () => {
+	process.exit(1);
 });
 
 const port = config.port || 3000;

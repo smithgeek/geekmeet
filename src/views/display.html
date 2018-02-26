@@ -20,7 +20,7 @@
 
             function setNonMeetingIframeContent(){
                 if(room === "Setup"){
-                document.querySelector('#contentIframe').src = `/setup.html?color=${tv}`;
+                    document.querySelector('#contentIframe').src = `/setup.html?color=${tv}`;
                 }
                 else{
                     document.querySelector('#contentIframe').src = localStorage.getItem(tvId) || "";

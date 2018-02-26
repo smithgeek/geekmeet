@@ -19,6 +19,11 @@
         <div id="Tvs" style="margin: 3rem">
         </div>
         <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript">
+            if(localStorage.getItem("room") && localStorage.getItem("tv") && window.location.search === ""){
+                window.location.href = "/display.html";
+            }
+        </script>
         <script type="text/babel">
             const isAdmin = getParameterByName('admin') === "true";
             class Tv extends React.Component{
@@ -84,6 +89,7 @@
                         </div>}
 
                         <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`} className="card-link">Join</a>
+                        {isAdmin && <a href={`http://${tv.ip}:3000/`} className="card-link">Manage</a>}
                     </div>;
 
                     const renameView = <div>
@@ -134,5 +140,6 @@
             socket.on("query", render);
             socket.on("status_change", render);
         </script>
+
     </body>
 </html>
