@@ -3,10 +3,10 @@
 sudo apt-get update
 
 # Get the current version
-if [ ! -f ./version.txt ]; then
+if [ ! -f ~/version.txt ]; then
     version=0
 else
-    version=`cat version.txt`
+    version=`cat ~/version.txt`
 fi
 
 if [ $version -lt 1 ]
