@@ -36,7 +36,7 @@ app.get("/update.sh", (req, res) => {
 	res.send(content);
 });
 
-app.use(express.static('views'));
+app.use(express.static('./src/views'));
 
 interface Tv{
 	name: string;
