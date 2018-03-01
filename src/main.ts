@@ -32,7 +32,7 @@ app.use((_req, res, next) => {
 });
 
 function getScript(req: express.Request, file: string) {
-	return fs.readFileSync(`./views/${file}`, "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`);
+	return fs.readFileSync(`./src/views/${file}`, "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`);
 }
 
 app.get("/start.sh", (req, res) => {
