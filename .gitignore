@@ -31,3 +31,5 @@ build/
 /src/config.json
 /src/main.js*
 /src/main.d.ts
+/config.json
+/wifi.config

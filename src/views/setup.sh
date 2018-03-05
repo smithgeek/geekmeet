@@ -2,6 +2,8 @@
 
 sudo apt-get update
 
+rebootRequired=false
+
 # Get the current version
 if [ ! -f ~/version.txt ]; then
     version=0
@@ -58,7 +60,17 @@ then
     pm2 start src/index.js --name "nodebot"
     sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u linaro --hp /home/linaro
 
+	sudo nmcli c add con-name corp_wifi type wifi ifname wlan0 ssid anything
+	echo "{wificonfig}" | sudo tee /etc/NetworkManager/system-connections/corp_wifi > /dev/null
+	mac=`sudo cat /sys/class/net/wlan0/address`
+	sudo sed -i -e "s/{mac}/$mac/g" /etc/NetworkManager/system-connections/corp_wifi
+	rebootRequired=true
+
     # Update version
     cd ~
     echo "1" > "version.txt"
+fi
+
+if [ "$rebootRequired" = true ]; then
+	sudo reboot
 fi

@@ -9,7 +9,7 @@ const app = express();
 const http = new Server(app);
 const io = socketIo(http);
 
-let config: {epoch?: string, salt?: string, port?: string};
+let config: {epoch?: string, salt?: string, port?: string, host?: string};
 try {
 	config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 }
@@ -32,7 +32,10 @@ app.use((_req, res, next) => {
 });
 
 function getScript(req: express.Request, file: string) {
-	return fs.readFileSync(`./src/views/${file}`, "utf8").replace("{url}", `${req.protocol}://${req.get('host')}`);
+	const wifiConfig = fs.readFileSync("./wifi.config", "utf8");
+
+	return fs.readFileSync(`./src/views/${file}`, "utf8").replace("{url}", `https://${config.host || req.get('host')}`)
+		.replace("{wificonfig}", wifiConfig).replace(/\r\n/g, "\n");
 }
 
 app.get("/start.sh", (req, res) => {
