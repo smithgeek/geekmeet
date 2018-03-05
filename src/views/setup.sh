@@ -24,7 +24,13 @@ then
 	#Start Chromium on boot
 	echo 'chromium --homepage "{url}/display.html" --start-fullscreen &' >> ~/.xsessionrc
 	#Allow third party cookies so the jitsi meeting stuff actually works
-	sed -i -e 's/"block_third_party_cookies":true,/"block_third_party_cookies":false,/g' ~/.config/chromium/Default/Preferences
+	sudo mkdir /etc/chromium
+	sudo mkdir /etc/chromium/policies
+	sudo mkdir /etc/chromium/policies/managed
+	echo "{" | sudo tee /etc/chromium/policies/managed/policy.json > /dev/null
+	echo "  \"HomepageLocation\": \"https://tv.showings.com\"," | sudo tee -a /etc/chromium/policies/managed/policy.json > /dev/null
+	echo "  \"BlockThirdPartyCookies\": false" | sudo tee -a /etc/chromium/policies/managed/policy.json > /dev/null
+	echo "}" | sudo tee -a /etc/chromium/policies/managed/policy.json > /dev/null
 
     #Install nano
     sudo apt-get install -y nano
