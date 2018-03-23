@@ -77,7 +77,7 @@ then
     echo "1" > "version.txt"
 fi
 
-if [ $version -lt 2 ]
+if [ $version -lt 2 ]; then
 	sudo timedatectl set-timezone US/Central
 	echo "2" > "version.txt"
 fi
