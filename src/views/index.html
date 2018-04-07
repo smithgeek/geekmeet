@@ -33,7 +33,8 @@
                         url: this.props.tv.url || "",
                         renameView: false,
                         editRoomName: this.props.room.name,
-                        editTvName: this.props.tv.name
+                        editTvName: this.props.tv.name,
+                        simulcast: `${this.props.room.name}$${this.props.tv.name}`
                     }
                     this.handleAddressChange = this.handleAddressChange.bind(this);
                     this.handleKeyPress = this.handleKeyPress.bind(this);
@@ -41,6 +42,9 @@
                     this.sendNameChange = this.sendNameChange.bind(this);
                     this.handleRoomNameChange = this.handleRoomNameChange.bind(this);
                     this.handleTvNameChange = this.handleTvNameChange.bind(this);
+                    this.handleSimulcastChange = this.handleSimulcastChange.bind(this);
+                    this.startSimulcast = this.startSimulcast.bind(this);
+                    this.stopSimulcast = this.stopSimulcast.bind(this);
                 }
 
                 componentWillReceiveProps(nextProps){
@@ -75,8 +79,21 @@
                     socket.emit('action', {action: "NAME_CHANGE", target: `${room.name}_${tv.name}`, room: this.state.editRoomName, tv: this.state.editTvName});
                 }
 
-                render(){
+                handleSimulcastChange(event){
+                    this.setState({simulcast: event.target.value});
+                }
+
+                startSimulcast(){
                     const {tv, room} = this.props;
+                    socket.emit('action', {action: "START_SIMULCAST", target: `${room.name}_${tv.name}`, url: `/meeting.html?room=${this.state.simulcast.replace("$", "&tv=")}&isTv=true`});
+                }
+                stopSimulcast(){
+                    const {tv, room} = this.props;
+                    socket.emit('action', {action: "END_SIMULCAST", target: `${room.name}_${tv.name}`})
+                }
+
+                render(){
+                    const {tv, room, rooms} = this.props;
                     const standardView = <div className="card-text">
                         {isAdmin && <div className="input-group mb-3">
                             <div className="input-group-prepend">
@@ -90,6 +107,18 @@
 
                         <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`} className="card-link">Join</a>
                         {isAdmin && <a href={`http://${tv.ip.substring(0, tv.ip.indexOf(":"))}:3000/`} className="card-link">Manage</a>}
+                        <br />
+                        <hr />
+                        <h5>Join Another Meeting</h5>
+                        {isAdmin &&
+                            <select value={this.state.simulcast} onChange={this.handleSimulcastChange}>
+                                {rooms.map(r => {
+                                    return r.tvs.map(t => <option value={`${r.name}$${t.name}`} key={`option_${r.name}_${t.name}`}>{`${r.name}-${t.name}`}</option>)
+                                })}
+                            </select>}
+                            <br />
+                            <button className="btn btn-success" type="button" onClick={this.startSimulcast}>Start</button>
+                            <button className="btn btn-danger" style={{margin: 10}} type="button" onClick={this.stopSimulcast}>Stop</button>
                     </div>;
 
                     const renameView = <div>
@@ -128,10 +157,11 @@
             }
             function render(rooms){
                 if(rooms){
-                    ReactDOM.render(rooms.sort(orderByName).map(room => <div key={room.name}>
+                    rooms = rooms.sort(orderByName);
+                    ReactDOM.render(rooms.map(room => <div key={room.name}>
                         <h2>{room.name.replace(/_/g, " ")}</h2>
                         <div className="card-deck" style={{marginBottom: 20}}>
-                            {room.tvs.map(tv => <Tv tv={tv} room={room} key={tv.name} />)}
+                            {room.tvs.map(tv => <Tv tv={tv} room={room} key={tv.name} rooms={rooms} />)}
                         </div>
                     </div>), document.getElementById("Tvs"));
                 }

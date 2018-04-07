@@ -17,6 +17,7 @@
             const room = localStorage.getItem("room") || (getParameterByName("room") || "Setup").replace(/ /g, "_");
             const tvId = `${room}_${tv}`;
             let currentCount = 0;
+            let simulcast = false;
 
             function setNonMeetingIframeContent(){
                 if(room === "Setup"){
@@ -37,7 +38,7 @@
                 currentCount = count;
             }
             setInterval(() => {
-                if(currentCount === 0){
+                if(currentCount === 0 && !simulcast){
                     window.location.reload();
                 }
             }, 30 * 60 * 1000);
@@ -70,6 +71,14 @@
                     localStorage.setItem("tv", args.tv);
                     localStorage.setItem("room", args.room);
                     window.location.reload();
+                }
+                else if(args.action === "START_SIMULCAST"){
+                    simulcast = true;
+                    document.querySelector("#contentIframe").src = args.url;
+                }
+                else if(args.action === "END_SIMULCAST"){
+                    simulcast = false;
+                    document.querySelector("#contentIframe").src = localStorage.getItem(tvId);
                 }
             });
             socket.on("participants_change", handleParticipantCount);
