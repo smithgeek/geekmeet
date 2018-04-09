@@ -108,9 +108,9 @@
                         <a href={`/meeting.html?room=${room.name}&tv=${tv.name}`} className="card-link">Join</a>
                         {isAdmin && <a href={`http://${tv.ip.substring(0, tv.ip.indexOf(":"))}:3000/`} className="card-link">Manage</a>}
                         <br />
-                        <hr />
                         {isAdmin &&
 						<div>
+							<hr />
 							<h5>Join Another Meeting</h5>
                             <select value={this.state.simulcast} onChange={this.handleSimulcastChange}>
                                 {rooms.map(r => {
