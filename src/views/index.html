@@ -109,16 +109,18 @@
                         {isAdmin && <a href={`http://${tv.ip.substring(0, tv.ip.indexOf(":"))}:3000/`} className="card-link">Manage</a>}
                         <br />
                         <hr />
-                        <h5>Join Another Meeting</h5>
                         {isAdmin &&
+						<div>
+							<h5>Join Another Meeting</h5>
                             <select value={this.state.simulcast} onChange={this.handleSimulcastChange}>
                                 {rooms.map(r => {
                                     return r.tvs.map(t => <option value={`${r.name}$${t.name}`} key={`option_${r.name}_${t.name}`}>{`${r.name}-${t.name}`}</option>)
                                 })}
-                            </select>}
+                            </select>
                             <br />
                             <button className="btn btn-success" type="button" onClick={this.startSimulcast}>Start</button>
                             <button className="btn btn-danger" style={{margin: 10}} type="button" onClick={this.stopSimulcast}>Stop</button>
+						</div>}
                     </div>;
 
                     const renameView = <div>
