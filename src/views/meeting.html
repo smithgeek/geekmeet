@@ -59,7 +59,7 @@
                 api.executeCommand('avatarUrl', 'https://pbs.twimg.com/profile_images/742375648019107842/J5QjK8uT.jpg');
             }
             else{
-                api.on("displayNameChange", args => {
+                api.on("displayNameChanged", args => {
                     if(args.id === meId){
                         localStorage.setItem("jitsi_displayname", args.displayname)
                     }
