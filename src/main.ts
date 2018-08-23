@@ -57,6 +57,8 @@ interface Tv{
 	participants: number;
 	url?: string;
 	ip: string;
+	online: boolean;
+	statusTime: Date;
 }
 
 interface Room{
@@ -73,20 +75,23 @@ function joinTv(args: {room: string, tv: string, isTv?: boolean, url?: string}, 
 		rooms.push(room);
 	}
 	let tv = room.tvs.find(t => t.name === args.tv);
-	if (!tv) {
+	if (tv) {
+		tv.online = true;
+		tv.statusTime = new Date();
+		io.emit("status_change", rooms);
+	}
+	else {
 		const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-		tv = {name: args.tv, participants: 0, url : args.url, ip};
+		tv = {name: args.tv, participants: 0, url : args.url, ip, online: true, statusTime: new Date()};
 		room.tvs.push(tv);
 		// tslint:disable-next-line:no-console
 		console.log("new tv joined", { room: room.name, tv: tv.name, ip });
 		io.emit("status_change", rooms);
 		io.to(getTvId(args)).emit("query");
 		socket.on("disconnect", () => {
-			if(room && tv){
-				room.tvs.splice(room.tvs.indexOf(tv), 1);
-				if(room.tvs.length === 0){
-					rooms.splice(rooms.indexOf(room), 1);
-				}
+			if (tv) {
+				tv.online = false;
+				tv.statusTime = new Date();
 				io.emit("status_change", rooms);
 			}
 		});

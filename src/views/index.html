@@ -137,17 +137,20 @@
                         <div className="card-body">
                             <h5 className="card-title">
                                 {isAdmin && <button type="button" className="btn btn-link" style={{fontSize: "x-large"}} onClick={() => {this.setState({renameView: !this.state.renameView})}}>{tv.name.replace(/_/g, " ")}</button>}
-                                {!isAdmin && tv.name.replace(/_/g, " ")}
+								{!isAdmin && tv.name.replace(/_/g, " ")}
+								{tv.online ? "" : "(Disconnected)"}
                             </h5>
                             {this.state.renameView ? renameView : standardView}
                         </div>
                         <div className="card-footer">
-                            <small className="text-muted">{tv.participants} Users Joined</small>
+							<small className="text-muted">{tv.participants} Users Joined</small>
+							<small className="text-muted" style={{float: "right"}}>{tv.statusTime ? new Date(tv.statusTime).toLocaleString() : ""}</small>
                         </div>
                     </div>;
                 }
             }
 
+			var globalRooms;
             function orderByName(a,b){
                 const aName = a.name.toLowerCase();
                 const bName = b.name.toLowerCase();
@@ -159,7 +162,8 @@
             }
             function render(rooms){
                 if(rooms){
-                    rooms = rooms.sort(orderByName);
+					rooms = rooms.sort(orderByName);
+					globalRooms = rooms;
                     ReactDOM.render(rooms.map(room => <div key={room.name}>
                         <h2>{room.name.replace(/_/g, " ")}</h2>
                         <div className="card-deck" style={{marginBottom: 20}}>
