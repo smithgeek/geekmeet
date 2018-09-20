@@ -74,14 +74,15 @@ function joinTv(args: {room: string, tv: string, isTv?: boolean, url?: string}, 
 		room = {name: args.room, tvs: []};
 		rooms.push(room);
 	}
+	const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
 	let tv = room.tvs.find(t => t.name === args.tv);
 	if (tv) {
 		tv.online = true;
 		tv.statusTime = new Date();
+		tv.ip = ip;
 		io.emit("status_change", rooms);
 	}
 	else {
-		const ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
 		tv = {name: args.tv, participants: 0, url : args.url, ip, online: true, statusTime: new Date()};
 		room.tvs.push(tv);
 		// tslint:disable-next-line:no-console
